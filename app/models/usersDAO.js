@@ -1,30 +1,46 @@
 const users = (dbConnect, dbSchema) =>{
+	
+	const conn = dbConnect()
+	const schema = dbSchema.userSchema()
+	const user = conn.model('user', schema, 'users')
 
 	return{
-		list: ()=>{
-
+		list: async (email)=>{
+			const userInfo = await user.findOne({ email })
+			conn.close()
+			return new Promise((resolve, reject)=>{
+				console.log(userInfo)
+				if(userInfo){
+					resolve({userInfo})
+				}else{
+					reject({error:{msg:'usuário não encontrado'}})
+				}		
+			})
 		},
 
-		insert: (data, callback)=>{
-			const conn = dbConnect()
-			const schema = dbSchema.userSchema()
+		insert: (res, data, callback)=>{
+			
 			conn.on('error', ()=>{
 				console.error.bind(console, 'connection error:')
-				msg = 'ocorreu um problema ao cadastrar o usuário'
-				callback(msg)
+
 			})
 			
-			conn.once('open', function(){
+			conn.once('open', ()=>{
 				
-				const user = conn.model('user', schema, 'users')
+
 				const newUser = new user(data)
 			
-				newUser.save(function(err){
+				newUser.save(err=>{
 					
-					msg = 'usuário cadastrado com sucesso'
+					msg = { msg: 'usuário cadastrado com sucesso'}
 					conn.close();
 
-					if(err) return false
+					if(err){
+						errors = { msg: 'email em uso'}
+						console.error(err)
+						return res.status(422).json({ errors })
+					}
+					
 					callback(msg)
 				
 				});
@@ -32,12 +48,28 @@ const users = (dbConnect, dbSchema) =>{
 			});
 
 		},
-		
+
 		update: ()=>{
 
 		},
 		del: ()=>{
 
+		},
+		searchUserByEmail: (userEmail)=>{
+			
+				var teste =  user.findOne({ email: userEmail })
+
+				return teste.then(result=>{
+					return result
+				}).catch(err=>{
+					console.log(err)
+					throw err
+				})
+					
+				
+				
+				//console.log(resultado)
+				
 		}
 	}
 }
