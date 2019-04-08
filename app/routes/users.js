@@ -4,6 +4,9 @@ module.exports = app =>{
 	app.get('/user/:email', (req, res)=>{
 		controller.users(app, req, res).get()
 	})
+	app.get('/user', (req, res)=>{
+		controller.users(app, req, res).get()
+	})
 	app.post('/user', (req, res)=>{	
 		controller.users(app, req, res).insert()	
 	})

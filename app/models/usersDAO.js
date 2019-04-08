@@ -4,13 +4,23 @@ const users = (dbConnect, dbSchema) =>{
 	const schema = dbSchema.userSchema()
 	const user = conn.model('user', schema, 'users')
 
+	const returnUserId = async (email)=>{
+		const findUser = await user.findOne({email}) 		
+		return findUser._id
+	}
+
 	return{
 		list: async (email)=>{
-			const userInfo = await user.findOne({ email })
+			let userInfo
+
+			if(!email){
+				userInfo = await user.find({})
+			}else{
+				userInfo = await user.find({ email })
+			}
 			conn.close()
-			return new Promise((resolve, reject)=>{
-				console.log(userInfo)
-				if(userInfo){
+			return new Promise((resolve, reject)=>{	
+				if(userInfo.length !== 0){
 					resolve({userInfo})
 				}else{
 					reject({error:{msg:'usuário não encontrado'}})
@@ -49,11 +59,28 @@ const users = (dbConnect, dbSchema) =>{
 
 		},
 
-		update: ()=>{
-
+		update: async (data)=>{
+			const id = data._id
+			const update = await user.findOneAndUpdate({_id: id}, data)
+			return new Promise((resolve, reject)=>{
+				if(update){
+					resolve({msg: 'atualizado com sucesso'})
+				}else{
+					reject({msg: 'ocorreu um erro na atualização'})
+				}
+			})
 		},
-		del: ()=>{
-
+		del: async (_id)=>{
+			const deleted = await user.findOneAndDelete({_id})
+			console.log(deleted)
+			conn.close()
+			return new Promise((resolve, reject)=>{
+				if(deleted){
+					resolve({msg:'Usuário removido com sucesso'})
+				}else{
+					reject({error:{msg:'Não foi possível remover o usuário'}})
+				}
+			})
 		},
 		searchUserByEmail: (userEmail)=>{
 			
@@ -70,7 +97,8 @@ const users = (dbConnect, dbSchema) =>{
 				
 				//console.log(resultado)
 				
-		}
+		},
+
 	}
 }
 

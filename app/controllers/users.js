@@ -9,10 +9,10 @@ const users = (app, req, res)=>{
 
 		get: async ()=>{
 			
-			const email = req.params.email
+			let email = req.params.email
 			try{
 				const userInfo = await model.users(dbConnect, dbSchema).list(email)
-				res.send({userInfo})
+				res.send(userInfo)
 			}catch(error){
 				res.send(error)
 			}
@@ -43,16 +43,26 @@ const users = (app, req, res)=>{
 				})
 			}
 		},
-		update: ()=>{
-			//var connection = app.services.database.dbConnect;
-			//console.log(connection)
-			res.send('estou no controller update\n')
+		update: async ()=>{
+			const data = req.body
+			try{
+				const update = await model.users(dbConnect, dbSchema).update(data)
+				res.send(update)
+			}catch(error){
+				res.send(error)
+			}
+			
+			//res.send('estou no controller update\n')
 
 		},
-		del: ()=>{
-			
-			res.send('estou no controller delete\n')
-
+		del: async ()=>{
+			const data = req.body
+			try{
+				const deleted = await model.users(dbConnect, dbSchema).del(data)
+				res.send(deleted)
+			}catch(error){
+				res.send(error)
+			}
 		}
 
 	}
