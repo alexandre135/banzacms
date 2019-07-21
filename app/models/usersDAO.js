@@ -89,22 +89,22 @@ const users = (dbConnect, dbSchema, res) =>{
 			})
 		},
 
-		searchUserByEmail: (userEmail)=>{
+		// searchUserByEmail: (userEmail)=>{
 			
-				var teste =  user.findOne({ email: userEmail })
+		// 		var teste =  user.findOne({ email: userEmail })
 
-				return teste.then(result=>{
-					return result
-				}).catch(err=>{
-					console.log(err)
-					throw err
-				})
+		// 		return teste.then(result=>{
+		// 			return result
+		// 		}).catch(err=>{
+		// 			console.log(err)
+		// 			throw err
+		// 		})
 					
 				
 				
-				//console.log(resultado)
+		// 		//console.log(resultado)
 				
-		},
+		// },
 
 	}
 }
