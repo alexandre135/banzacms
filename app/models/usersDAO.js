@@ -1,8 +1,10 @@
-const users = (dbConnect, dbSchema) =>{
+const users = (dbConnect, dbSchema, res) =>{
 	
-	const conn = dbConnect()
+	const errorHandler = require('../../services/error.js')() 
+	const conn = dbConnect(res)
 	const schema = dbSchema.userSchema()
 	const user = conn.model('user', schema, 'users')
+
 
 	const returnUserId = async (email)=>{
 		const findUser = await user.findOne({email}) 		
@@ -16,14 +18,15 @@ const users = (dbConnect, dbSchema) =>{
 			if(!email){
 				userInfo = await user.find({})
 			}else{
-				userInfo = await user.find({ email })
+				userInfo = await user.find({ email }, (err)=>{ if(err)console.error('erro '+err)})
 			}
 			conn.close()
 			return new Promise((resolve, reject)=>{	
 				if(userInfo.length !== 0){
 					resolve({userInfo})
 				}else{
-					reject({error:{msg:'usuário não encontrado'}})
+					errorHandler('usuário não encontrado', reject)
+					//reject({error:{msg:'usuário não encontrado'}})
 				}		
 			})
 		},
@@ -62,26 +65,30 @@ const users = (dbConnect, dbSchema) =>{
 		update: async (data)=>{
 			const id = data._id
 			const update = await user.findOneAndUpdate({_id: id}, data)
+			conn.close()
 			return new Promise((resolve, reject)=>{
 				if(update){
 					resolve({msg: 'atualizado com sucesso'})
 				}else{
-					reject({msg: 'ocorreu um erro na atualização'})
+					errorHandler('ocorreu um erro na atualização', reject)
+					//reject({msg: 'ocorreu um erro na atualização'})
 				}
 			})
 		},
+
 		del: async (_id)=>{
 			const deleted = await user.findOneAndDelete({_id})
-			console.log(deleted)
 			conn.close()
 			return new Promise((resolve, reject)=>{
 				if(deleted){
 					resolve({msg:'Usuário removido com sucesso'})
 				}else{
-					reject({error:{msg:'Não foi possível remover o usuário'}})
+					errorHandler('Não foi possível remover o usuário', reject)
+					//reject({error:{msg:'Não foi possível remover o usuário'}})
 				}
 			})
 		},
+
 		searchUserByEmail: (userEmail)=>{
 			
 				var teste =  user.findOne({ email: userEmail })

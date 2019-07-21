@@ -11,13 +11,14 @@ const users = (app, req, res)=>{
 			
 			let email = req.params.email
 			try{
-				const userInfo = await model.users(dbConnect, dbSchema).list(email)
+				const userInfo = await model.users(dbConnect, dbSchema, res).list(email)
 				res.send(userInfo)
 			}catch(error){
-				res.send(error)
+				res.status(422).send(error)
 			}
 
 		},
+
 		insert: ()=>{
 			const data = req.body
 
@@ -29,39 +30,34 @@ const users = (app, req, res)=>{
     		req.check('email')
     		.isEmail().withMessage('Email inválido')
 
-    		
-
     		const errors = req.validationErrors();
-    		console.log('erros'+errors)
-
 			if (errors) {
 			    return res.status(422).json({ errors })
 			  }else{
-				model.users(dbConnect, dbSchema).insert(res, data, (result)=>{
+				model.users(dbConnect, dbSchema, res).insert(res, data, (result)=>{
 
 					res.send(result)
 				})
 			}
 		},
+
 		update: async ()=>{
 			const data = req.body
 			try{
-				const update = await model.users(dbConnect, dbSchema).update(data)
+				const update = await model.users(dbConnect, dbSchema, res).update(data)
 				res.send(update)
 			}catch(error){
-				res.send(error)
+				res.status(422).send(error)
 			}
-			
-			//res.send('estou no controller update\n')
-
 		},
+
 		del: async ()=>{
 			const data = req.body
 			try{
-				const deleted = await model.users(dbConnect, dbSchema).del(data)
+				const deleted = await model.users(dbConnect, dbSchema, res).del(data)
 				res.send(deleted)
 			}catch(error){
-				res.send(error)
+				res.status(422).send(error)
 			}
 		}
 
